@@ -13,7 +13,7 @@ app.get("/", (req, res) => {
 
 
 const openai = new OpenAI({
-apiKey:""
+apiKey: process.env.OPENAI_API_KEY
 });
 
 app.post("/grade", async (req, res) => {
