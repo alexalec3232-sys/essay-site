@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Essay Grader</title>
+</head>
+
+<body>
+
+<h1>AI Essay Grader</h1>
+
+<textarea id="essay" rows="10" cols="60" placeholder="Write your essay here..."></textarea>
+
+<br><br>
+
+<button onclick="gradeEssay()">Grade Essay</button>
+
+<h2>AI Suggestion:</h2>
+<p id="suggestion"></p >
+
+<script>
+async function gradeEssay() {
+
+  const text = document.getElementById("essay").value;
+
+  const response = await fetch("http://localhost:3000/grade", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      essay: text
+    })
+  });
+
+  const data = await response.json();
+
+  document.getElementById("suggestion").innerText = data.result;
+
+}
+</script>
+
+</body>
+</html>
