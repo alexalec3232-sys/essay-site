@@ -18,19 +18,11 @@
 <p id="suggestion"></p >
 
 <script>
+<script>
 async function gradeEssay() {
-
   const text = document.getElementById("essay").value;
 
- const response = await fetch("/grade", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    essay: text
-  })
-});
+  const response = await fetch("/grade", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -41,11 +33,6 @@ async function gradeEssay() {
   });
 
   const data = await response.json();
-
   document.getElementById("suggestion").innerText = data.result;
-
 }
 </script>
-
-</body>
-</html>
