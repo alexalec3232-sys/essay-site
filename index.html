@@ -93,7 +93,6 @@
 
 <body>
 
-  <!-- 首页 -->
   <div id="home" class="page active">
     <h1>如果你点开了，那就努力完成你心中的梦</h1>
     <p>If you opened this, then work hard to complete the dream in your heart.</p >
@@ -101,7 +100,6 @@
     <div class="learn" onclick="goInfo()">Learn More</div>
   </div>
 
-  <!-- 信息填写页 -->
   <div id="info" class="page">
     <h1>Tell AI About You</h1>
 
@@ -111,58 +109,53 @@
 
       <p>Best Skill / 最擅长</p >
       <select id="skill">
-        <option>Not sure</option>
-        <option>Writing</option>
-        <option>Reading</option>
-        <option>Speaking</option>
-        <option>Listening</option>
+        <option value="">Not sure</option>
+        <option value="Writing">Writing</option>
+        <option value="Reading">Reading</option>
+        <option value="Speaking">Speaking</option>
+        <option value="Listening">Listening</option>
       </select>
 
       <p>Identity / 身份</p >
       <select id="identity">
-        <option>Student</option>
-        <option>International Student</option>
-        <option>Exchange Student</option>
+        <option value="">Student</option>
+        <option value="International Student">International Student</option>
+        <option value="Exchange Student">Exchange Student</option>
       </select>
 
       <p>Goal / 使用目的</p >
       <select id="goal">
-        <option>Improve English</option>
-        <option>IELTS</option>
-        <option>School Exam</option>
-        <option>Daily Communication</option>
+        <option value="">Improve English</option>
+        <option value="IELTS">IELTS</option>
+        <option value="School Exam">School Exam</option>
+        <option value="Daily Communication">Daily Communication</option>
       </select>
 
       <button onclick="goEssay()">Continue</button>
     </div>
   </div>
 
-  <!-- 作文页 -->
   <div id="essayPage" class="page">
     <h1>AI Essay Helper</h1>
     <p>Write your essay and get instant feedback.</p >
 
-    <!-- 1. 填写作文 -->
     <div class="card">
       <h2>Your Essay</h2>
       <textarea id="essay" rows="8" placeholder="Write your essay here..."></textarea>
       <button onclick="gradeEssay()">Grade Essay</button>
     </div>
 
-    <!-- 2. 回复作文 -->
     <div class="card">
       <h2>Essay Feedback</h2>
       <div id="suggestion" class="result-box">Waiting for your essay...</div>
     </div>
 
-    <!-- 3. 提问 -->
     <div class="card">
       <h2>Ask AI</h2>
       <textarea id="question" rows="3" placeholder="Ask about grammar, vocabulary, sentence meaning, or learning methods..."></textarea>
       <button onclick="askAI()">Send Question</button>
     </div>
 
-    <!-- 4. 回复问题 -->
     <div class="card">
       <h2>AI Response</h2>
       <div id="chatResponse" class="result-box">Waiting for your question...</div>
@@ -170,8 +163,16 @@
   </div>
 
   <script>
+    // 只在本次页面有效，刷新后消失
+    let userProfile = {
+      grade: "",
+      skill: "",
+      identity: "",
+      goal: ""
+    };
+
     function showPage(id){
-      document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
       document.getElementById(id).classList.add("active");
     }
 
@@ -180,16 +181,15 @@
     }
 
     function goEssay(){
+      userProfile.grade = document.getElementById("grade")?.value || "";
+      userProfile.skill = document.getElementById("skill")?.value || "";
+      userProfile.identity = document.getElementById("identity")?.value || "";
+      userProfile.goal = document.getElementById("goal")?.value || "";
       showPage("essayPage");
     }
 
     async function gradeEssay(){
       const essay = document.getElementById("essay").value.trim();
-      const grade = document.getElementById("grade")?.value || "";
-      const skill = document.getElementById("skill")?.value || "";
-      const identity = document.getElementById("identity")?.value || "";
-      const goal = document.getElementById("goal")?.value || "";
-      const lastEssay = localStorage.getItem("lastEssay") || "";
 
       if(!essay){
         document.getElementById("suggestion").innerText = "请先输入作文内容。";
@@ -206,18 +206,15 @@
           },
           body:JSON.stringify({
             essay,
-            grade,
-            skill,
-            identity,
-            goal,
-            lastEssay
+            grade: userProfile.grade,
+            skill: userProfile.skill,
+            identity: userProfile.identity,
+            goal: userProfile.goal
           })
         });
 
         const data = await res.json();
-        document.getElementById("suggestion").innerText = data.result || "批改失败。";
-        localStorage.setItem("lastEssay", essay);
-
+        document.getElementById("suggestion").innerText = data.result || "批改失败，请稍后再试。";
       }catch(error){
         document.getElementById("suggestion").innerText = "批改失败，请稍后再试。";
       }
@@ -227,9 +224,6 @@
       const question = document.getElementById("question").value.trim();
       const essay = document.getElementById("essay").value.trim();
       const feedback = document.getElementById("suggestion").innerText;
-
-      const lastAskQuestion = localStorage.getItem("lastAskQuestion") || "";
-      const lastAskAnswer = localStorage.getItem("lastAskAnswer") || "";
 
       if(!question){
         document.getElementById("chatResponse").innerText = "请先输入你的问题。";
@@ -247,20 +241,12 @@
           body:JSON.stringify({
             question,
             essay,
-            feedback,
-            lastAskQuestion,
-            lastAskAnswer
+            feedback
           })
         });
 
         const data = await res.json();
-        const result = data.result || "回答失败。";
-
-        document.getElementById("chatResponse").innerText = result;
-
-        localStorage.setItem("lastAskQuestion", question);
-        localStorage.setItem("lastAskAnswer", result);
-
+        document.getElementById("chatResponse").innerText = data.result || "回答失败，请稍后再试。";
       }catch(error){
         document.getElementById("chatResponse").innerText = "回答失败，请稍后再试。";
       }
