@@ -78,7 +78,16 @@ margin-top:10px;
 <p id="chatResponse"></p >
 
   <script>
+async function askAI() {
 
+alert("WORKING");
+
+const question = document.getElementById("chatInput").value;
+
+document.getElementById("chatResponse").innerText =
+"You asked: " + question;
+
+}
     let currentEssay = "";
 let currentFeedback = "";
 
@@ -96,6 +105,8 @@ async function askAI() {
     document.getElementById("chatResponse").innerText = "Please type a question first.";
     return;
   }
+
+
 
   if (!currentEssay || !currentFeedback) {
     document.getElementById("chatResponse").innerText =
