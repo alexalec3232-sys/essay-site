@@ -4,7 +4,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>AI Essay Helper</title>
 
 <style>
@@ -45,68 +44,43 @@ font-size:18px;
 /* 按钮 */
 
 button{
-
 background:black;
 color:white;
-
 border:none;
-
 padding:14px 30px;
-
 border-radius:30px;
-
 font-size:18px;
-
 cursor:pointer;
-
 margin-top:20px;
-
 }
 
 /* Learn More */
 
 .learn{
-
 margin-top:20px;
-
 color:#666;
-
 cursor:pointer;
-
 }
 
 /* 输入 */
 
 textarea,input,select{
-
 width:100%;
-
 padding:14px;
-
 border-radius:10px;
-
 border:1px solid #ddd;
-
 margin-top:10px;
-
 font-size:16px;
-
 }
 
 /* 卡片 */
 
 .card{
-
 background:white;
-
 padding:20px;
-
 border-radius:20px;
-
 margin-top:20px;
-
 box-shadow:0 5px 20px rgba(0,0,0,0.05);
-
 }
 
 </style>
@@ -115,16 +89,13 @@ box-shadow:0 5px 20px rgba(0,0,0,0.05);
 
 <body>
 
-
 <!-- 首页 -->
 
 <div id="home" class="page active">
 
 <h1>如果你点开了，那就努力完成你心中的梦</h1>
 
-<p>
-If you opened this, then work hard to complete the dream in your heart.
-</p >
+<p>If you opened this, then work hard to complete the dream in your heart.</p >
 
 <button onclick="goEssay()">Start Free</button>
 
@@ -187,18 +158,33 @@ If you opened this, then work hard to complete the dream in your heart.
 <p>Write your essay and get instant feedback.</p >
 
 
+<!-- Card 1 -->
+
 <div class="card">
 
+<h2>Your Essay</h2>
+
 <textarea id="essay" rows="8" placeholder="Write your essay here..."></textarea>
+
+</div>
+
+
+<!-- Card 2 -->
+
+<div class="card">
+
+<h2>Grade Essay</h2>
 
 <button onclick="gradeEssay()">Grade Essay</button>
 
 </div>
 
 
+<!-- Card 3 -->
+
 <div class="card">
 
-<h2>AI Suggestion</h2>
+<h2>Ask AI</h2>
 
 <textarea id="question" rows="3" placeholder="Ask about grammar or improvement"></textarea>
 
@@ -206,6 +192,8 @@ If you opened this, then work hard to complete the dream in your heart.
 
 </div>
 
+
+<!-- Card 4 -->
 
 <div class="card">
 
@@ -215,12 +203,10 @@ If you opened this, then work hard to complete the dream in your heart.
 
 </div>
 
-
 </div>
 
 
 <script>
-
 
 function showPage(id){
 
@@ -311,9 +297,7 @@ document.getElementById("result").innerText=data.result;
 
 }
 
-
 </script>
-
 
 </body>
 </html>
