@@ -1,178 +1,217 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Essay Grader</title>
+<meta charset="UTF-8">
+<title>AI Essay Grader</title>
 
-  <style>
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: Arial, sans-serif;
-      background: #f5f5f7;
-      color: #1d1d1f;
-    }
+<style>
 
-    .hero {
-      text-align: center;
-      padding: 60px 20px 40px;
-    }
+body{
+  font-family: Arial, sans-serif;
+  margin:0;
+  padding:0;
+  text-align:center;
+  background:#f5f5f5;
+}
 
-    .hero h1 {
-      font-size: 40px;
-      margin-bottom: 10px;
-    }
+#introPage{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
 
-    .hero p {
-      color: #666;
-      font-size: 18px;
-      margin: 8px 0;
-    }
+#introPage h1{
+  font-size:48px;
+  margin-bottom:10px;
+}
 
-    .hero button {
-      margin-top: 20px;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 999px;
-      background: black;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
+#introPage p{
+  font-size:18px;
+  color:#555;
+  max-width:600px;
+}
 
-    textarea {
-      width: 100%;
-      max-width: 700px;
-      font-size: 16px;
-      min-height: 160px;
-      display: block;
-      margin: 20px auto 0;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
+button{
+  margin-top:20px;
+  padding:12px 24px;
+  font-size:16px;
+  border:none;
+  border-radius:8px;
+  background:black;
+  color:white;
+  cursor:pointer;
+}
 
-    .main-btn {
-      display: block;
-      margin: 16px auto;
-      height: 44px;
-      padding: 0 24px;
-      font-size: 16px;
-      border: none;
-      border-radius: 999px;
-      background: black;
-      color: white;
-      cursor: pointer;
-    }
+button:hover{
+  opacity:0.8;
+}
 
-    h2 {
-      max-width: 700px;
-      margin: 28px auto 12px;
-    }
+#appPage{
+  padding:40px;
+}
 
-    p {
-      max-width: 700px;
-      margin: 0 auto 16px;
-      line-height: 1.7;
-      white-space: pre-wrap;
-    }
-  </style>
+textarea{
+  width:90%;
+  max-width:700px;
+  height:200px;
+  padding:10px;
+  font-size:16px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+</style>
 </head>
+
+
 <body>
 
-  <div class="hero">
-    <h1>AI Essay Grader</h1>
-    <p>Get instant feedback on your English essays.</p >
-    <button onclick="document.getElementById('essay').scrollIntoView({behavior:'smooth'})">
-      Start Grading
-    </button>
-  </div>
 
-  <textarea id="essay" rows="10" placeholder="Write your essay here..."></textarea>
+<!-- Intro Page -->
 
-  <button id="gradeBtn" class="main-btn" onclick="gradeEssay()">Grade Essay</button>
+<div id="introPage">
 
-  <h2>AI Suggestion:</h2>
-  <p id="suggestion"></p >
+<h1>AI Essay Grader</h1>
 
-  <h2>Ask AI about your essay:</h2>
-  <textarea id="chatInput" rows="4" placeholder="Ask about grammar, vocabulary, or how to improve your essay..."></textarea>
+<p>Improve your English writing with instant AI feedback.</p >
 
-  <button class="main-btn" onclick="askAI()">Send Question</button>
+<p>Grammar correction • Vocabulary improvement • Teacher comments</p >
 
-  <h2>AI Chat:</h2>
-  <p id="chatResponse"></p >
+<button onclick="enterApp()">Enter</button>
 
-  <script>
-    let currentEssay = "";
-    let currentFeedback = "";
+</div>
 
-    async function gradeEssay() {
-      const btn = document.getElementById("gradeBtn");
-      const text = document.getElementById("essay").value;
 
-      if (!text.trim()) {
-        document.getElementById("suggestion").innerText = "Please write an essay first.";
-        return;
-      }
 
-      currentEssay = text;
-      btn.innerText = "Grading...";
-      btn.disabled = true;
+<!-- App Page -->
 
-      document.getElementById("suggestion").innerText = "AI is grading your essay...";
+<div id="appPage" style="display:none;">
 
-      const response = await fetch("/grade", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          essay: text
-        })
-      });
+<h1>AI Essay Grader</h1>
 
-      const data = await response.json();
-      currentFeedback = data.result;
-      document.getElementById("suggestion").innerText = data.result;
+<textarea id="essay" placeholder="Write your essay here..."></textarea>
 
-      btn.innerText = "Grade Essay";
-      btn.disabled = false;
-    }
+<br>
 
-    async function askAI() {
-      const question = document.getElementById("chatInput").value;
+<button onclick="gradeEssay()">Grade Essay</button>
 
-      if (!question.trim()) {
-        document.getElementById("chatResponse").innerText = "Please type a question first.";
-        return;
-      }
+<h2>AI Suggestion</h2>
 
-      if (!currentEssay || !currentFeedback) {
-        document.getElementById("chatResponse").innerText =
-          "Please grade an essay first before asking questions.";
-        return;
-      }
+<p id="suggestion"></p >
 
-      document.getElementById("chatResponse").innerText = "AI is answering your question...";
 
-      const response = await fetch("/ask", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          essay: currentEssay,
-          feedback: currentFeedback,
-          question: question
-        })
-      });
+<h2>Ask AI about your essay</h2>
 
-      const data = await response.json();
-      document.getElementById("chatResponse").innerText = data.result;
-    }
-  </script>
+<textarea id="chatInput" placeholder="Ask about grammar or improvements..."></textarea>
+
+<br>
+
+<button onclick="askAI()">Send Question</button>
+
+<h2>AI Chat</h2>
+
+<p id="chatResponse"></p >
+
+</div>
+
+
+
+<script>
+
+
+function enterApp(){
+
+document.getElementById("introPage").style.display="none";
+
+document.getElementById("appPage").style.display="block";
+
+}
+
+
+
+let currentEssay="";
+let currentFeedback="";
+
+
+async function gradeEssay(){
+
+const essay=document.getElementById("essay").value;
+
+if(!essay){
+
+alert("Please write an essay first.");
+
+return;
+
+}
+
+document.getElementById("suggestion").innerText="Grading...";
+
+
+const response=await fetch("/grade",{
+
+method:"POST",
+
+headers:{ "Content-Type":"application/json" },
+
+body:JSON.stringify({ essay:essay })
+
+});
+
+
+const data=await response.json();
+
+document.getElementById("suggestion").innerText=data.result;
+
+currentEssay=essay;
+
+currentFeedback=data.result;
+
+}
+
+
+
+async function askAI(){
+
+const question=document.getElementById("chatInput").value;
+
+if(!question){
+
+return;
+
+}
+
+document.getElementById("chatResponse").innerText="AI is answering...";
+
+
+const response=await fetch("/grade",{
+
+method:"POST",
+
+headers:{ "Content-Type":"application/json" },
+
+body:JSON.stringify({
+
+essay: currentEssay + "\n\nUser question: " + question + "\n\nTeacher feedback: " + currentFeedback
+
+})
+
+});
+
+
+const data=await response.json();
+
+document.getElementById("chatResponse").innerText=data.result;
+
+}
+
+
+
+</script>
+
+
 </body>
 </html>
