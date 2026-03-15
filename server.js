@@ -25,6 +25,7 @@ const openai = new OpenAI({
 
 app.post("/grade", async (req, res) => {
   try {
+
     const essay = req.body.essay;
 
     if (!essay) {
@@ -36,44 +37,43 @@ app.post("/grade", async (req, res) => {
       messages: [
         {
           role: "system",
-          content: `你是一名专业但有人情味的英语写作老师。学生发来的内容里，可能同时包含：
-1. 他的随口表达、情绪、吐槽、犹豫
-2. 真正的英文作文内容
+          content: `你是一名专业但有人情味的英语写作老师。
 
-你的任务是：
-1. 先判断学生有没有表达情绪或状态
-2. 如果有，用中文先简短回应一句，像老师一样自然一点，不要太假
-3. 然后识别其中真正的英文作文内容
-4. 再严格按照下面格式批改作文
+学生发来的内容里，可能同时包含：
+1. 他的情绪或随口表达
+2. 真正的英文作文
+
+你的任务：
+
+1. 如果学生有表达情绪，先简单回应一句（像真人老师）
+2. 找出真正的英文作文
+3. 按下面格式批改
 
 返回格式必须是：
 
 Warm Response:
-（如果学生前面表达了情绪、犹豫、吐槽、压力，就先自然回应一句；如果没有，就写“无”）
+（如果学生表达了情绪就回应一句，否则写“无”）
 
 Score:
-（给出10分制分数）
+（10分制）
 
 Grammar:
-（列出2-4个最明显的语法问题）
+（2-4个语法问题）
 
 Vocabulary:
-（列出2-4个词汇提升建议）
+（2-4个词汇建议）
 
 Improvement:
-（给出2-3句更好的改写建议）
+（2-3句更好的改写）
 
 Teacher Comment:
-（用自然、具体、不那么像AI套话的方式总结评价）
+（自然总结）
 
-最后补充一句：
+最后补一句：
 如果你愿意，可以根据这些建议修改作文再提交一次，我可以帮你看看你提升了哪里。
 
 要求：
-- Warm Response 要像真人老师，不要太长
-- 如果学生前半段不是作文，不要把那些中文口语当成作文批改
-- 主要批改真正的英文作文内容
-- 不要输出多余开场白`
+不要输出多余开场白。`
         },
         {
           role: "user",
@@ -83,11 +83,17 @@ Teacher Comment:
     });
 
     const result = response.choices[0].message.content;
+
     res.json({ result });
 
   } catch (error) {
+
     console.error("GRADE ERROR:", error);
-    res.status(500).json({ result: "Server error." });
+
+    res.status(500).json({
+      result: "Server error."
+    });
+
   }
 });
 
@@ -98,6 +104,7 @@ Teacher Comment:
 
 app.post("/ask", async (req, res) => {
   try {
+
     const { essay, feedback, question } = req.body;
 
     if (!question) {
@@ -105,23 +112,39 @@ app.post("/ask", async (req, res) => {
     }
 
     const response = await openai.chat.completions.create({
+
       model: "gpt-4o-mini",
+
       messages: [
         {
           role: "system",
           content: `你是一名英语写作辅导老师。
 
 如果学生提供了作文和批改结果，就结合这些内容回答。
-如果学生没有提供作文，就把他当成普通英语学习者，直接回答他的英语问题。
+如果没有作文，就把学生当普通英语学习者。
 
-要求：
-1. 用中文回答
-2. 回答清晰具体
-3. 语法问题解释原因
-4. 表达问题给更自然例句
-5. 词汇问题给学习建议
-6. 不要说空话`
+回答要求：
+
+1 用中文回答
+2 解释清楚语法或表达
+3 必要时给例句
+4 不要太长
+5 像真人老师说话
+
+最重要的一点：
+
+回答完学生问题后，你要主动给一个继续学习的建议，例如：
+
+- 我可以给你几个例句
+- 我可以帮你改写一句
+- 我可以给你一个简单练习
+- 我可以给你一个记忆方法
+
+最后加一句：
+
+"如果你愿意，我可以继续给你这些内容，你只需要回复“行”就可以。"`
         },
+
         {
           role: "user",
           content: `学生作文：
@@ -137,13 +160,17 @@ ${question}`
     });
 
     const result = response.choices[0].message.content;
+
     res.json({ result });
 
   } catch (error) {
+
     console.error("ASK ERROR:", error);
+
     res.status(500).json({
-      result: "AI failed to answer. Please try again."
+      result: "AI failed to answer."
     });
+
   }
 });
 
