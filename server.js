@@ -36,7 +36,20 @@ app.post("/grade", async (req, res) => {
       messages: [
         {
           role: "system",
-          content: `你是一名专业的英语写作老师。请用中文批改这篇英文作文，并严格按照下面格式返回：
+          content: `你是一名专业但有人情味的英语写作老师。学生发来的内容里，可能同时包含：
+1. 他的随口表达、情绪、吐槽、犹豫
+2. 真正的英文作文内容
+
+你的任务是：
+1. 先判断学生有没有表达情绪或状态
+2. 如果有，用中文先简短回应一句，像老师一样自然一点，不要太假
+3. 然后识别其中真正的英文作文内容
+4. 再严格按照下面格式批改作文
+
+返回格式必须是：
+
+Warm Response:
+（如果学生前面表达了情绪、犹豫、吐槽、压力，就先自然回应一句；如果没有，就写“无”）
 
 Score:
 （给出10分制分数）
@@ -56,7 +69,11 @@ Teacher Comment:
 最后补充一句：
 如果你愿意，可以根据这些建议修改作文再提交一次，我可以帮你看看你提升了哪里。
 
-不要输出多余开场白，必须严格按上面的标题格式返回。`
+要求：
+- Warm Response 要像真人老师，不要太长
+- 如果学生前半段不是作文，不要把那些中文口语当成作文批改
+- 主要批改真正的英文作文内容
+- 不要输出多余开场白`
         },
         {
           role: "user",
@@ -69,19 +86,18 @@ Teacher Comment:
     res.json({ result });
 
   } catch (error) {
-    console.error(error);
+    console.error("GRADE ERROR:", error);
     res.status(500).json({ result: "Server error." });
   }
 });
 
 
 /* ------------------------
-   ASK AI (NO ESSAY NEEDED)
+   ASK AI
 ------------------------ */
 
 app.post("/ask", async (req, res) => {
   try {
-
     const { essay, feedback, question } = req.body;
 
     if (!question) {
@@ -121,17 +137,13 @@ ${question}`
     });
 
     const result = response.choices[0].message.content;
-
     res.json({ result });
 
   } catch (error) {
-
     console.error("ASK ERROR:", error);
-
     res.status(500).json({
       result: "AI failed to answer. Please try again."
     });
-
   }
 });
 
