@@ -1,459 +1,189 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Essay Grader</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<title>AI Essay Grader</title>
 
-    :root {
-      --bg: #f5f5f7;
-      --card: rgba(255,255,255,0.72);
-      --text: #111111;
-      --muted: #6e6e73;
-      --line: rgba(0,0,0,0.08);
-      --shadow: 0 12px 40px rgba(0,0,0,0.08);
-      --radius: 24px;
-    }
+<style>
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background:
-        radial-gradient(circle at top, #ffffff 0%, #f5f5f7 55%, #ececf1 100%);
-      color: var(--text);
-    }
+body{
+font-family:Arial, sans-serif;
+margin:0;
+padding:0;
+background:#f5f5f7;
+color:#111;
+}
 
-    button, textarea {
-      font-family: inherit;
-    }
+button,textarea{
+font-family:inherit;
+}
 
-    .page-shell {
-      width: 100%;
-      min-height: 100vh;
-    }
+#introPage{
+min-height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+text-align:center;
+padding:24px;
+}
 
-    #introPage {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-    }
+#introPage h1{
+font-size:32px;
+margin-bottom:10px;
+}
 
-    .intro-card {
-      width: 100%;
-      max-width: 980px;
-      background: var(--card);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border: 1px solid var(--line);
-      border-radius: 32px;
-      box-shadow: var(--shadow);
-      padding: 64px 32px;
-      text-align: center;
-    }
+#introPage p{
+color:#666;
+margin-bottom:20px;
+}
 
-    .eyebrow {
-      font-size: 14px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 18px;
-    }
+.main-btn{
+background:black;
+color:white;
+border:none;
+padding:14px 26px;
+border-radius:999px;
+font-size:16px;
+cursor:pointer;
+}
 
-    .intro-card h1 {
-      font-size: clamp(30px, 6vw, 64px);
-      line-height: 1.15;
-      margin: 0 0 18px;
-      font-weight: 700;
-    }
+#appPage{
+display:none;
+max-width:900px;
+margin:auto;
+padding:30px;
+}
 
-    .intro-card .sub-cn {
-      font-size: clamp(16px, 2.6vw, 22px);
-      line-height: 1.7;
-      color: #3a3a3c;
-      max-width: 760px;
-      margin: 0 auto 10px;
-    }
+textarea{
+width:100%;
+padding:16px;
+border-radius:12px;
+border:1px solid #ddd;
+margin-top:10px;
+font-size:16px;
+}
 
-    .intro-card .sub-en {
-      font-size: clamp(14px, 2.2vw, 18px);
-      line-height: 1.7;
-      color: var(--muted);
-      max-width: 760px;
-      margin: 0 auto 28px;
-    }
+.output{
+background:white;
+border:1px solid #eee;
+border-radius:12px;
+padding:16px;
+margin-top:10px;
+white-space:pre-wrap;
+}
 
-    .feature-row {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin: 20px auto 32px;
-      max-width: 820px;
-    }
-
-    .feature-pill {
-      padding: 10px 16px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255,255,255,0.78);
-      color: #2d2d2f;
-      font-size: 14px;
-    }
-
-    .main-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 150px;
-      height: 50px;
-      padding: 0 26px;
-      border: none;
-      border-radius: 999px;
-      background: linear-gradient(180deg, #1f1f22 0%, #000 100%);
-      color: white;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
-      transition: transform 0.18s ease, opacity 0.18s ease;
-    }
-
-    .main-btn:hover {
-      transform: translateY(-1px);
-      opacity: 0.96;
-    }
-
-    #appPage {
-      display: none;
-      padding: 28px 18px 60px;
-    }
-
-    .app-wrap {
-      max-width: 1040px;
-      margin: 0 auto;
-    }
-
-    .hero {
-      text-align: center;
-      margin: 10px 0 30px;
-    }
-
-    .hero h1 {
-      margin: 0 0 10px;
-      font-size: clamp(30px, 6vw, 52px);
-      line-height: 1.1;
-    }
-
-    .hero p {
-      margin: 0 auto;
-      max-width: 720px;
-      font-size: clamp(14px, 2.2vw, 18px);
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    .tool-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 22px;
-      align-items: start;
-    }
-
-    .panel {
-      background: var(--card);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 22px;
-    }
-
-    .panel h2 {
-      margin: 0 0 14px;
-      font-size: clamp(22px, 3vw, 30px);
-      line-height: 1.2;
-    }
-
-    .panel .mini {
-      font-size: 14px;
-      color: var(--muted);
-      margin: -4px 0 14px;
-      line-height: 1.6;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 210px;
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 18px;
-      background: rgba(255,255,255,0.88);
-      padding: 16px;
-      font-size: 16px;
-      outline: none;
-      resize: vertical;
-    }
-
-    textarea:focus {
-      border-color: rgba(0,0,0,0.22);
-    }
-
-    .button-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-
-    .secondary-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 140px;
-      height: 48px;
-      padding: 0 22px;
-      border-radius: 999px;
-      border: 1px solid rgba(0,0,0,0.1);
-      background: rgba(255,255,255,0.86);
-      color: #111;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .output-box {
-      min-height: 140px;
-      border-radius: 18px;
-      border: 1px solid rgba(0,0,0,0.08);
-      background: rgba(255,255,255,0.88);
-      padding: 18px;
-      line-height: 1.75;
-      white-space: pre-wrap;
-      word-break: break-word;
-      color: #222;
-    }
-
-    .stack {
-      display: flex;
-      flex-direction: column;
-      gap: 22px;
-    }
-
-    .footer-note {
-      text-align: center;
-      margin-top: 28px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    @media (max-width: 860px) {
-      .tool-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .intro-card {
-        padding: 52px 22px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      #introPage {
-        padding: 16px;
-      }
-
-      .intro-card {
-        padding: 44px 18px;
-        border-radius: 24px;
-      }
-
-      #appPage {
-        padding: 18px 12px 40px;
-      }
-
-      .panel {
-        padding: 16px;
-        border-radius: 20px;
-      }
-
-      textarea {
-        min-height: 160px;
-      }
-
-      .button-row {
-        flex-direction: column;
-      }
-
-      .main-btn,
-      .secondary-btn {
-        width: 100%;
-      }
-    }
-  </style>
+</style>
 </head>
+
 <body>
-  <div class="page-shell">
 
-    <div id="introPage">
-      <div class="intro-card">
-        <div class="eyebrow">Built from an idea</div>
-        <h1>如果你点开了，那就努力完成你心中的梦</h1>
-        <p class="sub-cn">把想法变成现实，永远比停在脑子里更重要。</p >
-        <p class="sub-en">If you opened this, then work hard to complete the dream in your heart.</p >
+<div id="introPage">
 
-        <div class="feature-row">
-          <div class="feature-pill">Grammar Correction</div>
-          <div class="feature-pill">Vocabulary Improvement</div>
-          <div class="feature-pill">Teacher-style Feedback</div>
-          <div class="feature-pill">AI Follow-up Questions</div>
-        </div>
+<h1>如果你点开了，那就努力完成你心中的梦</h1>
 
-        <button class="main-btn" onclick="enterApp()">Start Free</button>
-      </div>
-    </div>
+<p>If you opened this, then work hard to complete the dream in your heart.</p >
 
-    <div id="appPage">
-      <div class="app-wrap">
+<button class="main-btn" onclick="enterApp()">Start Free</button>
 
-        <div class="hero">
-          <h1>AI Essay Grader</h1>
-          <p>Write your essay, get instant feedback, and ask AI follow-up questions like a real writing tutor.</p >
-        </div>
+</div>
 
-        <div class="tool-grid">
-          <div class="panel">
-            <h2>Write Your Essay</h2>
-            <p class="mini">Paste your English writing below and get instant AI feedback.</p >
+<div id="appPage">
 
-            <textarea id="essay" placeholder="Write your essay here..."></textarea>
+<h1>AI Essay Grader</h1>
 
-            <div class="button-row">
-              <button id="gradeBtn" class="main-btn" onclick="gradeEssay()">Grade Essay</button>
-              <button class="secondary-btn" onclick="clearEssay()">Clear Essay</button>
-            </div>
-          </div>
+<textarea id="essay" placeholder="Write your essay here..."></textarea>
 
-          <div class="stack">
-            <div class="panel">
-              <h2>AI Suggestion</h2>
-              <div id="suggestion" class="output-box"></div>
-            </div>
+<button class="main-btn" onclick="gradeEssay()">Grade Essay</button>
 
-            <div class="panel">
-              <h2>Ask AI About Your Essay</h2>
-              <p class="mini">Ask about grammar, wording, tone, or how to improve a sentence.</p >
+<h2>AI Suggestion</h2>
 
-              <textarea id="chatInput" placeholder="Ask about grammar, vocabulary, or how to improve your essay..."></textarea>
+<div id="suggestion" class="output"></div>
 
-              <div class="button-row">
-                <button class="main-btn" onclick="askAI()">Send Question</button>
-              </div>
+<h2>Ask AI About Your Essay</h2>
 
-              <h2 style="margin-top:22px;">AI Chat</h2>
-              <div id="chatResponse" class="output-box"></div>
-            </div>
-          </div>
-        </div>
+<textarea id="chatInput" placeholder="Ask about grammar, vocabulary, or how to improve your essay..."></textarea>
 
-        <div class="footer-note">Version 1.0 · Built with AI and persistence</div>
-      </div>
-    </div>
+<button class="main-btn" onclick="askAI()">Send Question</button>
 
-  </div>
+<h2>AI Chat</h2>
 
-  <script>
-    let currentEssay = "";
-    let currentFeedback = "";
+<div id="chatResponse" class="output"></div>
 
-    function enterApp() {
-      document.getElementById("introPage").style.display = "none";
-      document.getElementById("appPage").style.display = "block";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+</div>
 
-    function clearEssay() {
-      document.getElementById("essay").value = "";
-      document.getElementById("chatInput").value = "";
-      document.getElementById("suggestion").innerText = "";
-      document.getElementById("chatResponse").innerText = "";
-      currentEssay = "";
-      currentFeedback = "";
-    }
+<script>
 
-    async function gradeEssay() {
-      const btn = document.getElementById("gradeBtn");
-      const essay = document.getElementById("essay").value.trim();
+let currentEssay="";
+let currentFeedback="";
 
-      if (!essay) {
-        document.getElementById("suggestion").innerText = "Please write an essay first.";
-        return;
-      }
+function enterApp(){
+document.getElementById("introPage").style.display="none";
+document.getElementById("appPage").style.display="block";
+}
 
-      currentEssay = essay;
-      document.getElementById("suggestion").innerText = "AI is grading your essay...";
-      btn.innerText = "Grading...";
-      btn.disabled = true;
+async function gradeEssay(){
 
-      try {
-        const response = await fetch("/grade", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ essay })
-        });
+const essay=document.getElementById("essay").value.trim();
 
-        const data = await response.json();
-        currentFeedback = data.result || "No feedback returned.";
-        document.getElementById("suggestion").innerText = currentFeedback;
-      } catch (error) {
-        document.getElementById("suggestion").innerText = "Something went wrong. Please try again.";
-      } finally {
-        btn.innerText = "Grade Essay";
-        btn.disabled = false;
-      }
-    }
+if(!essay){
+document.getElementById("suggestion").innerText="Please write an essay first.";
+return;
+}
 
-    async function askAI() {
-      const question = document.getElementById("chatInput").value.trim();
+currentEssay=essay;
 
-      if (!question) {
-        document.getElementById("chatResponse").innerText = "Please type a question first.";
-        return;
-      }
+document.getElementById("suggestion").innerText="AI is grading your essay...";
 
-      if (!currentEssay || !currentFeedback) {
-        document.getElementById("chatResponse").innerText = "Please grade an essay first before asking questions.";
-        return;
-      }
+const response=await fetch("/grade",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({essay})
+});
 
-      document.getElementById("chatResponse").innerText = "AI is answering your question...";
+const data=await response.json();
 
-      try {
-        const response = await fetch("/ask", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            essay: currentEssay,
-            feedback: currentFeedback,
-            question: question
-          })
-        });
+currentFeedback=data.result;
 
-        const data = await response.json();
-        document.getElementById("chatResponse").innerText = data.result || "No answer returned.";
-      } catch (error) {
-        document.getElementById("chatResponse").innerText = "Something went wrong. Please try again.";
-      }
-    }
-  </script>
+document.getElementById("suggestion").innerText=currentFeedback;
+
+}
+
+async function askAI(){
+
+const question=document.getElementById("chatInput").value.trim();
+
+if(!question){
+document.getElementById("chatResponse").innerText="Please type a question.";
+return;
+}
+
+document.getElementById("chatResponse").innerText="AI is answering your question...";
+
+const response=await fetch("/ask",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+essay:currentEssay||"",
+feedback:currentFeedback||"",
+question:question
+})
+});
+
+const data=await response.json();
+
+document.getElementById("chatResponse").innerText=data.result;
+
+}
+
+</script>
+
 </body>
 </html>

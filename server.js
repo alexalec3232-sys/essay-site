@@ -19,7 +19,9 @@ const openai = new OpenAI({
 });
 
 
-/* ---------------- ESSAY GRADING ---------------- */
+/* ------------------------
+   ESSAY GRADING
+------------------------ */
 
 app.post("/grade", async (req, res) => {
   try {
@@ -52,7 +54,9 @@ Teacher Comment:
 （用自然、具体、不那么像AI套话的方式总结评价）
 
 最后补充一句：
-如果你愿意，可以根据这些建议修改作文再提交一次，我可以帮你看看你提升了哪里。`
+如果你愿意，可以根据这些建议修改作文再提交一次，我可以帮你看看你提升了哪里。
+
+不要输出多余开场白，必须严格按上面的标题格式返回。`
         },
         {
           role: "user",
@@ -62,17 +66,18 @@ Teacher Comment:
     });
 
     const result = response.choices[0].message.content;
-
     res.json({ result });
 
   } catch (error) {
-    console.error("GRADE ERROR:", error);
+    console.error(error);
     res.status(500).json({ result: "Server error." });
   }
 });
 
 
-/* ---------------- AI QUESTION ---------------- */
+/* ------------------------
+   ASK AI (NO ESSAY NEEDED)
+------------------------ */
 
 app.post("/ask", async (req, res) => {
   try {
@@ -88,21 +93,26 @@ app.post("/ask", async (req, res) => {
       messages: [
         {
           role: "system",
-          content: `你是一名英语写作辅导老师。学生已经收到作文批改，现在正在问问题。请用中文清晰回答学生的问题。
+          content: `你是一名英语写作辅导老师。
+
+如果学生提供了作文和批改结果，就结合这些内容回答。
+如果学生没有提供作文，就把他当成普通英语学习者，直接回答他的英语问题。
 
 要求：
-1. 解释语法错误
-2. 提供更自然表达
-3. 如果可以给例句
-4. 不要说空话`
+1. 用中文回答
+2. 回答清晰具体
+3. 语法问题解释原因
+4. 表达问题给更自然例句
+5. 词汇问题给学习建议
+6. 不要说空话`
         },
         {
           role: "user",
           content: `学生作文：
-${essay || ""}
+${essay || "（没有提供作文）"}
 
 之前批改：
-${feedback || ""}
+${feedback || "（没有提供批改）"}
 
 学生问题：
 ${question}`
@@ -121,6 +131,7 @@ ${question}`
     res.status(500).json({
       result: "AI failed to answer. Please try again."
     });
+
   }
 });
 
