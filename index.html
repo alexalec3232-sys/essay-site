@@ -125,6 +125,7 @@ document.getElementById("introPage").style.display="none";
 document.getElementById("appPage").style.display="block";
 }
 
+
 async function gradeEssay(){
 
 const essay=document.getElementById("essay").value.trim();
@@ -132,6 +133,40 @@ const essay=document.getElementById("essay").value.trim();
 if(!essay){
 document.getElementById("suggestion").innerText="Please write an essay first.";
 return;
+}
+
+const lastEssay = localStorage.getItem("lastEssay");
+
+let essayToSend = essay;
+
+if(lastEssay && lastEssay !== essay){
+essayToSend = `你需要批改这篇新作文，并和上一版作文进行对比。
+
+上一版作文：
+${lastEssay}
+
+新版作文：
+${essay}
+
+请仍然按照下面格式返回：
+
+Score:
+（给出10分制分数）
+
+Grammar:
+（列出2-4个最明显的语法问题）
+
+Vocabulary:
+（列出2-4个词汇提升建议）
+
+Improvement:
+（给出2-3句更好的改写建议）
+
+Teacher Comment:
+（用自然、具体、不那么像AI套话的方式总结评价）
+
+Progress Compared with Last Essay:
+（重点说明这次比上一次提升了什么，哪里还有问题）`;
 }
 
 currentEssay=essay;
@@ -143,7 +178,7 @@ method:"POST",
 headers:{
 "Content-Type":"application/json"
 },
-body:JSON.stringify({essay})
+body:JSON.stringify({essay:essayToSend})
 });
 
 const data=await response.json();
@@ -152,7 +187,10 @@ currentFeedback=data.result;
 
 document.getElementById("suggestion").innerText=currentFeedback;
 
+localStorage.setItem("lastEssay", essay);
+
 }
+
 
 async function askAI(){
 
