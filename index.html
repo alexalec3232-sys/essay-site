@@ -7,6 +7,46 @@
 
 <style>
 
+.hero{
+  text-align:center;
+  padding:80px 20px;
+}
+
+.hero h1{
+  font-size:40px;
+  margin-bottom:10px;
+}
+
+.hero p{
+  color:#666;
+  font-size:18px;
+}
+
+.hero button{
+  margin-top:20px;
+  padding:12px 24px;
+  border:none;
+  border-radius:999px;
+  background:black;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+textarea{
+width:100%;
+max-width:600px;
+font-size:16px;
+}
+
+button{
+height:40px;
+font-size:16px;
+margin-top:10px;
+}
+
+</style>
+
 textarea{
 width:100%;
 max-width:600px;
@@ -22,7 +62,13 @@ margin-top:10px;
 </style>
 </head>
 <body>
+  <div class="hero">
   <h1>AI Essay Grader</h1>
+  <p>Get instant feedback on your English essays.</p >
+  <button onclick="document.getElementById('essay').scrollIntoView({behavior:'smooth'})">
+    Start Grading
+  </button>
+</div>
 
 <textarea id="essay" rows="10" placeholder="Write your essay here..."></textarea>
 
@@ -38,7 +84,7 @@ margin-top:10px;
       const text = document.getElementById("essay").value;
 
       document.getElementById("suggestion").innerText = "AI is grading your essay...";
-      
+
       const response = await fetch("/grade", {
         method: "POST",
         headers: {
