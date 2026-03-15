@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,80 +10,103 @@
 <style>
 
 body{
+font-family: Arial;
 margin:0;
-font-family:Arial, sans-serif;
-background:linear-gradient(135deg,#f5f5f5,#e9e9e9);
-}
-
-/* 封面 */
-
-.hero{
-height:100vh;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
+background:#f5f5f5;
+color:#111;
 text-align:center;
-padding:20px;
 }
 
-.hero h1{
-font-size:36px;
-margin-bottom:10px;
-}
+/* 页面 */
 
-.hero p{
-font-size:18px;
-color:#666;
-max-width:500px;
-}
-
-button{
-padding:14px 26px;
-font-size:16px;
-border:none;
-border-radius:30px;
-cursor:pointer;
-margin-top:20px;
-}
-
-.primary{
-background:black;
-color:white;
-}
-
-.secondary{
-background:#eee;
-color:#333;
-}
-
-/* 主页面 */
-
-.main{
+.page{
+display:none;
+padding:40px 20px;
 max-width:700px;
 margin:auto;
-padding:20px;
-display:none;
 }
 
-textarea{
+.active{
+display:block;
+}
+
+/* 标题 */
+
+h1{
+font-size:40px;
+margin-bottom:20px;
+}
+
+p{
+color:#666;
+font-size:18px;
+}
+
+/* 按钮 */
+
+button{
+
+background:black;
+color:white;
+
+border:none;
+
+padding:14px 30px;
+
+border-radius:30px;
+
+font-size:18px;
+
+cursor:pointer;
+
+margin-top:20px;
+
+}
+
+/* Learn More */
+
+.learn{
+
+margin-top:20px;
+
+color:#666;
+
+cursor:pointer;
+
+}
+
+/* 输入 */
+
+textarea,input,select{
+
 width:100%;
-min-height:160px;
-font-size:16px;
-padding:10px;
-}
 
-input,select{
-width:100%;
-padding:8px;
-font-size:14px;
-}
+padding:14px;
 
-.result{
-background:#f5f5f5;
-padding:12px;
+border-radius:10px;
+
+border:1px solid #ddd;
+
 margin-top:10px;
-white-space:pre-wrap;
+
+font-size:16px;
+
+}
+
+/* 卡片 */
+
+.card{
+
+background:white;
+
+padding:20px;
+
+border-radius:20px;
+
+margin-top:20px;
+
+box-shadow:0 5px 20px rgba(0,0,0,0.05);
+
 }
 
 </style>
@@ -94,9 +116,9 @@ white-space:pre-wrap;
 <body>
 
 
-<!-- 首页封面 -->
+<!-- 首页 -->
 
-<div class="hero" id="hero">
+<div id="home" class="page active">
 
 <h1>如果你点开了，那就努力完成你心中的梦</h1>
 
@@ -104,128 +126,138 @@ white-space:pre-wrap;
 If you opened this, then work hard to complete the dream in your heart.
 </p >
 
-<button class="primary" onclick="enterSite()">
-Start Free
-</button>
+<button onclick="goEssay()">Start Free</button>
 
-<button class="secondary" onclick="scrollInfo()">
-Learn More
-</button>
+<div class="learn" onclick="goInfo()">Learn More</div>
 
 </div>
 
 
-<!-- 主功能区 -->
+<!-- 信息填写页 -->
 
-<div class="main" id="main">
+<div id="info" class="page">
+
+<h1>Tell AI About You</h1>
+
+<div class="card">
+
+<p>Grade / 年级</p >
+<input id="grade" placeholder="e.g. Grade 10 / 高二">
+
+<p>Best Skill / 最擅长</p >
+
+<select id="skill">
+<option>Not sure</option>
+<option>Writing</option>
+<option>Reading</option>
+<option>Speaking</option>
+<option>Listening</option>
+</select>
+
+<p>Identity / 身份</p >
+
+<select id="identity">
+<option>Student</option>
+<option>International Student</option>
+<option>Exchange Student</option>
+</select>
+
+<p>Goal / 使用目的</p >
+
+<select id="goal">
+<option>Improve English</option>
+<option>IELTS</option>
+<option>School Exam</option>
+<option>Daily Communication</option>
+</select>
+
+<button onclick="goEssay()">Continue</button>
+
+</div>
+
+</div>
+
+
+<!-- 作文页 -->
+
+<div id="essayPage" class="page">
 
 <h1>AI Essay Helper</h1>
 
 <p>Write your essay and get instant feedback.</p >
 
-<hr>
 
-<h3>Optional: Tell AI about you</h3>
+<div class="card">
 
-<label>Grade / 年级</label>
-<input id="grade" placeholder="e.g. Grade 10 / 高二">
+<textarea id="essay" rows="8" placeholder="Write your essay here..."></textarea>
 
-<br><br>
+<button onclick="gradeEssay()">Grade Essay</button>
 
-<label>Best Skill / 最擅长</label>
+</div>
 
-<select id="skill">
-<option value="">Not sure</option>
-<option>Writing</option>
-<option>Speaking</option>
-<option>Reading</option>
-<option>Listening</option>
-</select>
 
-<br><br>
+<div class="card">
 
-<label>Identity / 身份</label>
+<h2>AI Suggestion</h2>
 
-<select id="identity">
-<option value="">Student</option>
-<option>International student</option>
-<option>Overseas student</option>
-</select>
+<textarea id="question" rows="3" placeholder="Ask about grammar or improvement"></textarea>
 
-<br><br>
+<button onclick="askAI()">Send Question</button>
 
-<label>Goal / 使用目的</label>
+</div>
 
-<select id="goal">
-<option value="">Improve English</option>
-<option>IELTS preparation</option>
-<option>School exam</option>
-<option>Daily communication</option>
-</select>
 
-<hr>
+<div class="card">
 
-<h3>Your Essay</h3>
+<h2>AI Response</h2>
 
-<textarea id="essay" placeholder="Write your essay here..."></textarea>
+<p id="result">Waiting...</p >
 
-<button class="primary" onclick="gradeEssay()">Grade Essay</button>
+</div>
 
-<h3>AI Feedback</h3>
-
-<div class="result" id="suggestion"></div>
-
-<hr>
-
-<h3>Ask AI about your essay</h3>
-
-<textarea id="chatInput" placeholder="Ask grammar questions or how to improve your essay..."></textarea>
-
-<button class="primary" onclick="askAI()">Send Question</button>
-
-<h3>AI Chat</h3>
-
-<div class="result" id="chatResponse"></div>
 
 </div>
 
 
 <script>
 
-/* 进入网站 */
 
-function enterSite(){
+function showPage(id){
 
-document.getElementById("hero").style.display="none";
-document.getElementById("main").style.display="block";
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
 
-}
-
-/* Learn more 向下滚 */
-
-function scrollInfo(){
-
-window.scrollTo({
-top:window.innerHeight,
-behavior:"smooth"
-});
+document.getElementById(id).classList.add("active");
 
 }
 
-/* 作文批改 */
+
+function goInfo(){
+
+showPage("info");
+
+}
+
+
+function goEssay(){
+
+showPage("essayPage");
+
+}
+
+
 
 async function gradeEssay(){
 
-const essay=document.getElementById("essay").value;
+const essay = document.getElementById("essay").value;
 
-const grade=document.getElementById("grade").value;
-const skill=document.getElementById("skill").value;
-const identity=document.getElementById("identity").value;
-const goal=document.getElementById("goal").value;
+const grade = document.getElementById("grade")?.value || "";
+const skill = document.getElementById("skill")?.value || "";
+const identity = document.getElementById("identity")?.value || "";
+const goal = document.getElementById("goal")?.value || "";
 
-document.getElementById("suggestion").innerText="AI is thinking...";
+document.getElementById("result").innerText="AI is thinking...";
 
-const response=await fetch("/grade",{
+const res = await fetch("/grade",{
 
 method:"POST",
 
@@ -243,25 +275,22 @@ goal
 
 });
 
-const data=await response.json();
+const data = await res.json();
 
-document.getElementById("suggestion").innerText=data.result;
+document.getElementById("result").innerText=data.result;
 
 }
 
-/* AI问答 */
 
 async function askAI(){
 
-const question=document.getElementById("chatInput").value;
+const question=document.getElementById("question").value;
 
 const essay=document.getElementById("essay").value;
 
-const feedback=document.getElementById("suggestion").innerText;
+document.getElementById("result").innerText="AI is thinking...";
 
-document.getElementById("chatResponse").innerText="AI is thinking...";
-
-const response=await fetch("/ask",{
+const res=await fetch("/ask",{
 
 method:"POST",
 
@@ -270,21 +299,21 @@ headers:{
 },
 
 body:JSON.stringify({
-essay,
-feedback,
-question
+question,
+essay
 })
 
 });
 
-const data=await response.json();
+const data=await res.json();
 
-document.getElementById("chatResponse").innerText=data.result;
+document.getElementById("result").innerText=data.result;
 
 }
 
+
 </script>
 
-</body>
 
+</body>
 </html>
