@@ -78,25 +78,45 @@ margin-top:10px;
 <p id="chatResponse"></p >
 
   <script>
+
+    let currentEssay = "";
+let currentFeedback = "";
+
     async function gradeEssay() {
+
       const text = document.getElementById("essay").value;
+currentEssay = text;
 
-      document.getElementById("suggestion").innerText = "AI is grading your essay...";
+async function askAI() {
+  alert("askAI is running");
 
-      const response = await fetch("/grade", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          essay: text
-        })
-      });
+  const question = document.getElementById("chatInput").value;
 
-      const data = await response.json();
-      document.getElementById("suggestion").innerText = data.result;
-    }
-  </script>
-  
-</body>
-</html>
+  if (!question) {
+    document.getElementById("chatResponse").innerText = "Please type a question first.";
+    return;
+  }
+
+  if (!currentEssay || !currentFeedback) {
+    document.getElementById("chatResponse").innerText =
+      "Please grade an essay first before asking questions.";
+    return;
+  }
+
+  document.getElementById("chatResponse").innerText = "AI is answering your question...";
+
+  const response = await fetch("/ask", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      essay: currentEssay,
+      feedback: currentFeedback,
+      question: question
+    })
+  });
+
+  const data = await response.json();
+  document.getElementById("chatResponse").innerText = data.result;
+}
