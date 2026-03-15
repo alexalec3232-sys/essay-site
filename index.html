@@ -1,218 +1,280 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AI Essay Grader</title>
+<title>AI Essay Helper</title>
 
 <style>
 
 body{
-font-family:Arial, sans-serif;
 margin:0;
-padding:0;
-background:#f5f5f7;
-color:#111;
+font-family:Arial, sans-serif;
+background:linear-gradient(135deg,#f5f5f5,#e9e9e9);
 }
 
-button,textarea{
-font-family:inherit;
-}
+/* 封面 */
 
-#introPage{
-min-height:100vh;
+.hero{
+height:100vh;
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
 text-align:center;
-padding:24px;
+padding:20px;
 }
 
-#introPage h1{
-font-size:32px;
+.hero h1{
+font-size:36px;
 margin-bottom:10px;
 }
 
-#introPage p{
+.hero p{
+font-size:18px;
 color:#666;
-margin-bottom:20px;
+max-width:500px;
 }
 
-.main-btn{
+button{
+padding:14px 26px;
+font-size:16px;
+border:none;
+border-radius:30px;
+cursor:pointer;
+margin-top:20px;
+}
+
+.primary{
 background:black;
 color:white;
-border:none;
-padding:14px 26px;
-border-radius:999px;
-font-size:16px;
-cursor:pointer;
 }
 
-#appPage{
-display:none;
-max-width:900px;
+.secondary{
+background:#eee;
+color:#333;
+}
+
+/* 主页面 */
+
+.main{
+max-width:700px;
 margin:auto;
-padding:30px;
+padding:20px;
+display:none;
 }
 
 textarea{
 width:100%;
-padding:16px;
-border-radius:12px;
-border:1px solid #ddd;
-margin-top:10px;
+min-height:160px;
 font-size:16px;
+padding:10px;
 }
 
-.output{
-background:white;
-border:1px solid #eee;
-border-radius:12px;
-padding:16px;
+input,select{
+width:100%;
+padding:8px;
+font-size:14px;
+}
+
+.result{
+background:#f5f5f5;
+padding:12px;
 margin-top:10px;
 white-space:pre-wrap;
 }
 
 </style>
+
 </head>
 
 <body>
 
-<div id="introPage">
+
+<!-- 首页封面 -->
+
+<div class="hero" id="hero">
 
 <h1>如果你点开了，那就努力完成你心中的梦</h1>
 
-<p>If you opened this, then work hard to complete the dream in your heart.</p >
+<p>
+If you opened this, then work hard to complete the dream in your heart.
+</p >
 
-<button class="main-btn" onclick="enterApp()">Start Free</button>
+<button class="primary" onclick="enterSite()">
+Start Free
+</button>
+
+<button class="secondary" onclick="scrollInfo()">
+Learn More
+</button>
 
 </div>
 
-<div id="appPage">
 
-<h1>AI Essay Grader</h1>
+<!-- 主功能区 -->
+
+<div class="main" id="main">
+
+<h1>AI Essay Helper</h1>
+
+<p>Write your essay and get instant feedback.</p >
+
+<hr>
+
+<h3>Optional: Tell AI about you</h3>
+
+<label>Grade / 年级</label>
+<input id="grade" placeholder="e.g. Grade 10 / 高二">
+
+<br><br>
+
+<label>Best Skill / 最擅长</label>
+
+<select id="skill">
+<option value="">Not sure</option>
+<option>Writing</option>
+<option>Speaking</option>
+<option>Reading</option>
+<option>Listening</option>
+</select>
+
+<br><br>
+
+<label>Identity / 身份</label>
+
+<select id="identity">
+<option value="">Student</option>
+<option>International student</option>
+<option>Overseas student</option>
+</select>
+
+<br><br>
+
+<label>Goal / 使用目的</label>
+
+<select id="goal">
+<option value="">Improve English</option>
+<option>IELTS preparation</option>
+<option>School exam</option>
+<option>Daily communication</option>
+</select>
+
+<hr>
+
+<h3>Your Essay</h3>
 
 <textarea id="essay" placeholder="Write your essay here..."></textarea>
 
-<button class="main-btn" onclick="gradeEssay()">Grade Essay</button>
+<button class="primary" onclick="gradeEssay()">Grade Essay</button>
 
-<h2>AI Suggestion</h2>
+<h3>AI Feedback</h3>
 
-<div id="suggestion" class="output"></div>
+<div class="result" id="suggestion"></div>
 
-<h2>Ask AI About Your Essay</h2>
+<hr>
 
-<textarea id="chatInput" placeholder="Ask about grammar, vocabulary, or how to improve your essay..."></textarea>
+<h3>Ask AI about your essay</h3>
 
-<button class="main-btn" onclick="askAI()">Send Question</button>
+<textarea id="chatInput" placeholder="Ask grammar questions or how to improve your essay..."></textarea>
 
-<h2>AI Chat</h2>
+<button class="primary" onclick="askAI()">Send Question</button>
 
-<div id="chatResponse" class="output"></div>
+<h3>AI Chat</h3>
+
+<div class="result" id="chatResponse"></div>
 
 </div>
 
+
 <script>
 
-let currentEssay="";
-let currentFeedback="";
+/* 进入网站 */
 
-function enterApp(){
-document.getElementById("introPage").style.display="none";
-document.getElementById("appPage").style.display="block";
+function enterSite(){
+
+document.getElementById("hero").style.display="none";
+document.getElementById("main").style.display="block";
+
 }
 
+/* Learn more 向下滚 */
+
+function scrollInfo(){
+
+window.scrollTo({
+top:window.innerHeight,
+behavior:"smooth"
+});
+
+}
+
+/* 作文批改 */
 
 async function gradeEssay(){
 
-const essay=document.getElementById("essay").value.trim();
+const essay=document.getElementById("essay").value;
 
-if(!essay){
-document.getElementById("suggestion").innerText="Please write an essay first.";
-return;
-}
+const grade=document.getElementById("grade").value;
+const skill=document.getElementById("skill").value;
+const identity=document.getElementById("identity").value;
+const goal=document.getElementById("goal").value;
 
-const lastEssay = localStorage.getItem("lastEssay");
-
-let essayToSend = essay;
-
-if(lastEssay && lastEssay !== essay){
-essayToSend = `你需要批改这篇新作文，并和上一版作文进行对比。
-
-上一版作文：
-${lastEssay}
-
-新版作文：
-${essay}
-
-请仍然按照下面格式返回：
-
-Score:
-（给出10分制分数）
-
-Grammar:
-（列出2-4个最明显的语法问题）
-
-Vocabulary:
-（列出2-4个词汇提升建议）
-
-Improvement:
-（给出2-3句更好的改写建议）
-
-Teacher Comment:
-（用自然、具体、不那么像AI套话的方式总结评价）
-
-Progress Compared with Last Essay:
-（重点说明这次比上一次提升了什么，哪里还有问题）`;
-}
-
-currentEssay=essay;
-
-document.getElementById("suggestion").innerText="AI is grading your essay...";
+document.getElementById("suggestion").innerText="AI is thinking...";
 
 const response=await fetch("/grade",{
+
 method:"POST",
+
 headers:{
 "Content-Type":"application/json"
 },
-body:JSON.stringify({essay:essayToSend})
+
+body:JSON.stringify({
+essay,
+grade,
+skill,
+identity,
+goal
+})
+
 });
 
 const data=await response.json();
 
-currentFeedback=data.result;
-
-document.getElementById("suggestion").innerText=currentFeedback;
-
-localStorage.setItem("lastEssay", essay);
+document.getElementById("suggestion").innerText=data.result;
 
 }
 
+/* AI问答 */
 
 async function askAI(){
 
-const question=document.getElementById("chatInput").value.trim();
+const question=document.getElementById("chatInput").value;
 
-if(!question){
-document.getElementById("chatResponse").innerText="Please type a question.";
-return;
-}
+const essay=document.getElementById("essay").value;
 
-document.getElementById("chatResponse").innerText="AI is answering your question...";
+const feedback=document.getElementById("suggestion").innerText;
+
+document.getElementById("chatResponse").innerText="AI is thinking...";
 
 const response=await fetch("/ask",{
+
 method:"POST",
+
 headers:{
 "Content-Type":"application/json"
 },
+
 body:JSON.stringify({
-essay:currentEssay||"",
-feedback:currentFeedback||"",
-question:question
+essay,
+feedback,
+question
 })
+
 });
 
 const data=await response.json();
@@ -224,4 +286,5 @@ document.getElementById("chatResponse").innerText=data.result;
 </script>
 
 </body>
+
 </html>
