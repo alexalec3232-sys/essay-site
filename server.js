@@ -2,12 +2,13 @@ const express = require("express");
 const cors = require("cors");
 const OpenAI = require("openai").default;
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "2mb" }));
 app.use(express.static(__dirname));
 
 app.get("/", (req, res) => {
@@ -18,6 +19,127 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+/* -------------------------
+   STATS STORAGE
+------------------------- */
+
+const STATS_FILE = path.join(__dirname, "stats.json");
+
+function defaultStats() {
+  return {
+    totalVisits: 0,
+    totalEssaySubmissions: 0,
+    totalAskRequests: 0,
+    recentVisits: [],
+    recentEssayUsage: [],
+    recentAskUsage: []
+  };
+}
+
+function loadStats() {
+  try {
+    if (!fs.existsSync(STATS_FILE)) {
+      const initial = defaultStats();
+      fs.writeFileSync(STATS_FILE, JSON.stringify(initial, null, 2), "utf8");
+      return initial;
+    }
+
+    const raw = fs.readFileSync(STATS_FILE, "utf8");
+    return JSON.parse(raw);
+  } catch (error) {
+    console.error("LOAD STATS ERROR:", error);
+    return defaultStats();
+  }
+}
+
+function saveStats(stats) {
+  try {
+    fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 2), "utf8");
+  } catch (error) {
+    console.error("SAVE STATS ERROR:", error);
+  }
+}
+
+function pushLimited(arr, item, limit = 50) {
+  arr.unshift(item);
+  if (arr.length > limit) {
+    arr.length = limit;
+  }
+}
+
+function recordVisit(info = {}) {
+  const stats = loadStats();
+  stats.totalVisits += 1;
+
+  pushLimited(stats.recentVisits, {
+    time: new Date().toISOString(),
+    page: info.page || "unknown",
+    userAgent: info.userAgent || "unknown"
+  });
+
+  saveStats(stats);
+}
+
+function recordEssayUsage(info = {}) {
+  const stats = loadStats();
+  stats.totalEssaySubmissions += 1;
+
+  pushLimited(stats.recentEssayUsage, {
+    time: new Date().toISOString(),
+    essayLength: info.essayLength || 0,
+    grade: info.grade || "",
+    skill: info.skill || "",
+    identity: info.identity || "",
+    goal: info.goal || ""
+  });
+
+  saveStats(stats);
+}
+
+function recordAskUsage(info = {}) {
+  const stats = loadStats();
+  stats.totalAskRequests += 1;
+
+  pushLimited(stats.recentAskUsage, {
+    time: new Date().toISOString(),
+    question: info.question || "",
+    questionLength: info.questionLength || 0
+  });
+
+  saveStats(stats);
+}
+
+/* -------------------------
+   TRACK VISIT
+------------------------- */
+
+app.post("/track-visit", (req, res) => {
+  try {
+    recordVisit({
+      page: req.body.page || "home",
+      userAgent: req.headers["user-agent"] || "unknown"
+    });
+
+    res.json({ ok: true });
+  } catch (error) {
+    console.error("TRACK VISIT ERROR:", error);
+    res.status(500).json({ ok: false });
+  }
+});
+
+/* -------------------------
+   VIEW STATS
+------------------------- */
+
+app.get("/stats", (req, res) => {
+  try {
+    const stats = loadStats();
+    res.json(stats);
+  } catch (error) {
+    console.error("GET STATS ERROR:", error);
+    res.status(500).json({ error: "Failed to load stats." });
+  }
+});
 
 /* -------------------------
    ESSAY GRADING
@@ -101,6 +223,15 @@ app.post("/grade", async (req, res) => {
     });
 
     const result = response.choices[0].message.content;
+
+    recordEssayUsage({
+      essayLength: essay.length,
+      grade,
+      skill,
+      identity,
+      goal
+    });
+
     res.json({ result });
 
   } catch (error) {
@@ -110,7 +241,6 @@ app.post("/grade", async (req, res) => {
     });
   }
 });
-
 
 /* -------------------------
    ASK AI
@@ -178,6 +308,12 @@ ${question}
     });
 
     const result = response.choices[0].message.content;
+
+    recordAskUsage({
+      question,
+      questionLength: question.length
+    });
+
     res.json({ result });
 
   } catch (error) {
@@ -187,7 +323,6 @@ ${question}
     });
   }
 });
-
 
 app.listen(PORT, () => {
   console.log("Server running on port " + PORT);
